@@ -18,7 +18,7 @@ exports.checkUserExist=async (req,res,next)=>{
         }
         else{
             console.log('password Incorrect');
-            res.status(404).json({success:false,message:'Password Incorrect'});
+            res.status(401).json({success:false,message:'Password Incorrect'});
         }
         
     }
