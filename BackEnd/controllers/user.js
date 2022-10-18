@@ -6,6 +6,26 @@ function isStringInvalid(string){
     }
     return false;
 }
+exports.checkUserExist=async (req,res,next)=>{
+    try{
+        const result=await User.findAll({where:{email:req.body.email}});
+        if(result.length===0){
+            console.log('User Not Exists');
+            res.status(404).json({success:false,message:'User Not Exists'});
+        }
+        else if(result[0].password===req.body.password){
+            res.json({success:true,message:'User Successfully Loggedin'});
+        }
+        else{
+            console.log('password Incorrect');
+            res.status(404).json({success:false,message:'Password Incorrect'});
+        }
+        
+    }
+    catch(err){
+        res.status(500).json(err);
+    }
+}
 exports.postUser=async (req,res,next)=>{
     try{
         // console.log("hi.........",req.body);
