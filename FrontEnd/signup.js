@@ -17,11 +17,13 @@ async function signupHandler(e){
         }
         console.log(userDetails);
         const res=await axiosObj.post('/user/signup',userDetails);
-        if(res.data.errors){
-            throw new Error("User already exists");
+        console.log(res);
+        if(res.status===201){
+            // window.location.href='./signup.html';
+            let a=1;
         }
         else{
-            window.location.href='./login.html';
+            throw new Error("User already exists");
         }
     }
     catch(err){

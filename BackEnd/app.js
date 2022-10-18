@@ -12,7 +12,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.json());
  //routes middleware
-app.use(userRoutes);
+app.use('/user',userRoutes);
 
 //associations
 
