@@ -7,7 +7,7 @@ function isStringInvalid(string){
     }
     return false;
 }
-exports.checkUserExist=async (req,res,next)=>{
+exports.loginUser=async (req,res,next)=>{
     try{
         const result=await User.findAll({where:{email:req.body.email}});
         if(result.length===0){
@@ -30,7 +30,7 @@ exports.checkUserExist=async (req,res,next)=>{
         res.status(500).json(err);
     }
 }
-exports.postUser=async (req,res,next)=>{
+exports.signupUser=async (req,res,next)=>{
     try{
         // console.log("hi.........",req.body);
         const {name,email,password}=req.body;

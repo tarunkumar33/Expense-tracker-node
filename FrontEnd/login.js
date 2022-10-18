@@ -15,6 +15,7 @@ async function loginHandler(e){
         });
         console.log(res);
         alert(res.data.message);
+        window.location.href='./expenses.html';
     }
     catch(err){
         console.log(err);

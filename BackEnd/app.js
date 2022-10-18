@@ -5,6 +5,8 @@ const sequelize=require('./utils/database');
  //routes import
 const userRoutes=require('./routes/user');
  //models import
+const User=require('./models/user');
+const Expense=require('./models/expense');
 
 //middlewares
 const app=express();
@@ -15,6 +17,8 @@ app.use(express.json());
 app.use('/user',userRoutes);
 
 //associations
+User.hasMany(Expense);
+Expense.belongsTo(User);
 
 //Sync Models with DB then listen to requests
 sequelize
