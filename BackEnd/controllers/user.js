@@ -1,11 +1,15 @@
 const User=require('../models/user');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
 function isStringInvalid(string){
     if(string==undefined || string.length===0){
         return true;
     }
     return false;
+}
+function generateAccessToken(id){
+    return jwt.sign({id:id},"asdffghjklhhgvmj");
 }
 exports.loginUser=async (req,res,next)=>{
     try{
@@ -17,7 +21,8 @@ exports.loginUser=async (req,res,next)=>{
         else{
             bcrypt.compare(req.body.password,result[0].password,(err,bcryptRes)=>{
                 if(bcryptRes){
-                    res.json({success:true,message:'User Successfully Loggedin'});
+                    // console.log("hi..........",result[0].id);
+                    res.json({success:true,message:'User Successfully Loggedin',token:generateAccessToken(result[0].id)});
                 }
                 else{
                     console.log('password Incorrect');
