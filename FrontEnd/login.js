@@ -24,3 +24,6 @@ async function loginHandler(e){
         document.body.innerHTML+=`<div style="color:red;">${err.response.data.message}</div>`;
     }
 }
+function forgotpassword() {
+    window.location.href = "./ForgotPassword/index.html";
+}
