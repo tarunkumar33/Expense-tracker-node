@@ -41,6 +41,10 @@ exports.resetpassword = async (req, res) => {
         const id = req.params.id;
         const forgotpasswordrequest = await Forgotpassword.findOne({ where: { id } });
         if (forgotpasswordrequest) {
+            if (!forgotpasswordrequest.active) {
+                res.status(404).json({ success: false, message: "Link got Expired" });
+                return;
+            }
             forgotpasswordrequest.update({ active: false });
             res.status(200).send(`<html>
                                     <script>
@@ -75,20 +79,14 @@ exports.updatepassword = async (req, res) => {
         if (user) {
             //encrypt the password
             const saltRounds = 10;
-            bcrypt.genSalt(saltRounds, function (err, salt) {
+            bcrypt.hash(newpassword, saltRounds, async function (err, hash) {
+                // Store hash in your password DB.
                 if (err) {
                     console.log(err);
                     throw new Error(err);
                 }
-                bcrypt.hash(newpassword, salt, async function (err, hash) {
-                    // Store hash in your password DB.
-                    if (err) {
-                        console.log(err);
-                        throw new Error(err);
-                    }
-                    await user.update({ password: hash });
-                    res.status(201).json({ message: 'Successfuly update the new password' });
-                });
+                user.update({ password: hash });
+                res.status(201).json({ message: 'Successfuly update the new password' });
             });
         } else {
             return res.status(404).json({ error: 'No user Exists', success: false })
@@ -96,5 +94,4 @@ exports.updatepassword = async (req, res) => {
     } catch (error) {
         return res.status(403).json({ error, success: false })
     }
-
 }
