@@ -1,7 +1,8 @@
 const razorpay=require('razorpay');
+const Order=require('../models/order');
 
-const RAZORPAY_KEY_ID='rzp_test_x3NCp1d1RlR0lp'
-const RAZORPAY_KEY_SECRET='EqOY1R60kIztSQlafnqQczhl'
+const RAZORPAY_KEY_ID='rzp_test_7EozIfQ8l31Aai'
+const RAZORPAY_KEY_SECRET='SiiyZJJlLoy4lFY40vjleAGm'
 
 const purchasepremium =async (req, res) => {
     try {
@@ -31,7 +32,7 @@ const purchasepremium =async (req, res) => {
  const updateTransactionStatus = (req, res ) => {
     try {
         const { payment_id, order_id} = req.body;
-        Order.findOne({where : {orderid : order_id}}).then(order => {
+        Order.findOne({where : {orderId : order_id}}).then(order => {
             order.update({ paymentid: payment_id, status: 'SUCCESSFUL'}).then(() => {
                 req.user.update({premiumUser: true})
                 return res.status(202).json({sucess: true, message: "Transaction Successful"});
