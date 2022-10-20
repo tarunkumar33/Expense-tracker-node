@@ -21,5 +21,6 @@ module.exports=sequelize.define('user',{
     password:{
         type:Sequelize.STRING,
         allowNull:false
-    }
+    },
+    premiumUser:Sequelize.BOOLEAN
 })
