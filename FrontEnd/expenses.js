@@ -3,13 +3,20 @@ const axiosObj = axios.create({
 });
 
 const token = localStorage.getItem('token');
+const premiumUser=localStorage.getItem('premiumUser');
 const expenseFormArea = document.getElementById('expenseForm');
 const expensesListArea = document.getElementById('expensesList');
 
 window.addEventListener("DOMContentLoaded", getExpenses);
 expenseFormArea.addEventListener('submit', expenseHandler);
 expensesListArea.addEventListener('click', expensesListAreaHandler);
-
+window.addEventListener("DOMContentLoaded", ()=>{
+    console.log('premiumUser:', premiumUser);
+    if(premiumUser!=null && premiumUser==="true"){
+        document.body.classList.add('bg-dark');
+        console.log(document.body);
+    }
+});
 async function expensesListAreaHandler(e) {
     try {
         e.preventDefault();
@@ -29,6 +36,7 @@ async function expensesListAreaHandler(e) {
 }
 async function getExpenses() {
     try {
+        
         const token = localStorage.getItem('token');
         const res = await axiosObj.get('/user/getExpenses', { headers: { Authorization: token } });
         console.log(res);

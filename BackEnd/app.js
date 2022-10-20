@@ -5,6 +5,7 @@ const sequelize=require('./utils/database');
  //routes import
 const userRoutes=require('./routes/user');
 const purchaseRoutes=require('./routes/purchase');
+const leaderboardRoutes=require('./routes/leaderboard');
  //models import
 const User=require('./models/user');
 const Expense=require('./models/expense');
@@ -18,6 +19,7 @@ app.use(express.json());
  //routes middleware
 app.use('/user',userRoutes);
 app.use('/purchase',purchaseRoutes);
+app.use('/leaderboard',leaderboardRoutes);
 
 //associations
 User.hasMany(Expense);

@@ -22,7 +22,7 @@ exports.loginUser=async (req,res,next)=>{
             bcrypt.compare(req.body.password,result[0].password,(err,bcryptRes)=>{
                 if(bcryptRes){
                     // console.log("hi..........",result[0].id);
-                    res.json({success:true,message:'User Successfully Loggedin',token:generateAccessToken(result[0].id)});
+                    res.json({success:true,message:'User Successfully Loggedin',token:generateAccessToken(result[0].id),premiumUser:result[0].premiumUser});
                 }
                 else{
                     console.log('password Incorrect');

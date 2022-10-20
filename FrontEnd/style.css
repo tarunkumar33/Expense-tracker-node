@@ -19,3 +19,6 @@ section{
 .form-group{
     margin: 20px;
 }
+.bg-dark{
+    background-color: #343a40;
+}

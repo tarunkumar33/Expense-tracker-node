@@ -14,6 +14,7 @@ async function loginHandler(e){
             password:e.target.password.value
         });
         localStorage.setItem('token',res.data.token);
+        localStorage.setItem('premiumUser',res.data.premiumUser);
         console.log(res);
         alert(res.data.message);
         window.location.href='./expenses.html';
