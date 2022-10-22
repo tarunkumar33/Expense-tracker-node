@@ -3,6 +3,7 @@ const axiosObj = axios.create({
 });
 
 const token = localStorage.getItem('token');
+const rowsperpage=localStorage.getItem('rowsperpage');
 const premiumUser = localStorage.getItem('premiumUser');
 const expenseFormArea = document.getElementById('expenseForm');
 const expensesListArea = document.getElementById('expensesList');
@@ -17,6 +18,24 @@ window.addEventListener("DOMContentLoaded", () => {
         console.log(document.body);
     }
 });
+
+function displayPagination({hasPreviousPage,previousPage,hasNextPage,nextPage,currentPage,lastPage}){
+    const pagination=document.getElementById('pagination');
+    pagination.innerHTML='';
+    if(hasPreviousPage){
+        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${previousPage})">
+        ${previousPage} </button>`;
+    }
+    pagination.innerHTML+=`<button class="btn active" style="border: solid 2px black;" onClick="showPageItems(${currentPage})">
+        ${currentPage}</button>`;
+    if(hasNextPage){
+        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${nextPage})">
+        ${nextPage}</button>`;
+    }
+    if(lastPage!=currentPage && lastPage!=nextPage)
+        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${lastPage})">
+        ${lastPage}</button>`;
+}
 async function expensesListAreaHandler(e) {
     try {
         e.preventDefault();
@@ -36,24 +55,36 @@ async function expensesListAreaHandler(e) {
 }
 async function getExpenses() {
     try {
-
-        const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token');
         const res = await axiosObj.get('/user/getExpenses', { headers: { Authorization: token } });
         console.log(res);
-        expensesListArea.innerHTML = '';
-        res.data.forEach((expense) => addNewExpenseToUI(expense));
+        displayExpensesInUI(res.data.expenses);
+        displayPagination(res.data);
     }
     catch (err) {
         console.log(err);
         document.body.innerHTML += `<div style="color:red;">${err.response.data.message}</div>`;
     }
 }
-
-function addNewExpenseToUI({ id, expenseAmount, description, category }) {
-    expensesListArea.innerHTML += `<li class="list-group-item" id=${id}>
-    ${expenseAmount}-${description}-${category}
-    <button class="btn btn-danger btn-sm float-right delete">X</button>
-    </li>`;
+async function showPageItems(page){
+    try{
+        const res = await axiosObj.get(`/user/getExpenses?page=${page}`, { headers: { Authorization: token } });
+        console.log(res);
+        displayExpensesInUI(res.data.expenses);
+        displayPagination(res.data);
+    }
+    catch (err) {
+        console.log(err);
+        document.body.innerHTML += `<div style="color:red;">${err.response.data.message}</div>`;
+    }
+}
+function displayExpensesInUI(expenses) {
+    expensesListArea.innerHTML = '';
+    expenses.forEach((expense) => {
+        const { id, expenseAmount, description, category } =expense;
+            expensesListArea.innerHTML += `<li class="list-group-item" id=${id}>${expenseAmount}-${description}-${category}
+            <button class="btn btn-danger btn-sm float-right delete">X</button></li>`;
+    });
 }
 
 async function expenseHandler(e) {
@@ -127,8 +158,8 @@ async function download(e) {
         console.log('response:', response);
 
         //download json as file
-        let exportObj=response.data;
-        let exportName="expenses";
+        let exportObj = response.data;
+        let exportName = "expenses";
         let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
         let downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);

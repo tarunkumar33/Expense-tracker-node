@@ -48,8 +48,23 @@ exports.addExpense = async (req, res, next) => {
 }
 exports.getExpenses = async (req, res, next) => {
     try {
-        const expensesRes = await req.user.getExpenses();
-        res.json(expensesRes);
+        const ITEMS_PER_PAGE=+req.query.rows || 2;
+        const currentPage=+req.query.page ||1;
+        const offsetValue=(currentPage-1)*ITEMS_PER_PAGE;
+
+        const expenses = await req.user.getExpenses({offset:offsetValue,limit:ITEMS_PER_PAGE});
+        const totalExpenses=await req.user.countExpenses();
+        
+        res.status(200).json({
+            expenses:expenses,
+            totalExpenses:totalExpenses,
+            hasPreviousPage:(currentPage>1),
+            hasNextPage:(currentPage*ITEMS_PER_PAGE)<totalExpenses,
+            currentPage:currentPage,
+            previousPage:currentPage-1,
+            nextPage:currentPage+1,
+            lastPage:Math.ceil(totalExpenses/ITEMS_PER_PAGE)
+        });
     }
     catch (err) {
         res.status(500).json(err);
