@@ -3,16 +3,16 @@ const axiosObj = axios.create({
 });
 
 const token = localStorage.getItem('token');
-const premiumUser=localStorage.getItem('premiumUser');
+const premiumUser = localStorage.getItem('premiumUser');
 const expenseFormArea = document.getElementById('expenseForm');
 const expensesListArea = document.getElementById('expensesList');
 
 window.addEventListener("DOMContentLoaded", getExpenses);
 expenseFormArea.addEventListener('submit', expenseHandler);
 expensesListArea.addEventListener('click', expensesListAreaHandler);
-window.addEventListener("DOMContentLoaded", ()=>{
+window.addEventListener("DOMContentLoaded", () => {
     console.log('premiumUser:', premiumUser);
-    if(premiumUser!=null && premiumUser==="true"){
+    if (premiumUser != null && premiumUser === "true") {
         document.body.classList.add('bg-dark');
         console.log(document.body);
     }
@@ -36,7 +36,7 @@ async function expensesListAreaHandler(e) {
 }
 async function getExpenses() {
     try {
-        
+
         const token = localStorage.getItem('token');
         const res = await axiosObj.get('/user/getExpenses', { headers: { Authorization: token } });
         console.log(res);
@@ -117,4 +117,35 @@ document.getElementById('rzp-button1').onclick = async function (e) {
         alert(response.error.metadata.order_id);
         alert(response.error.metadata.payment_id);
     });
+}
+
+async function download(e) {
+    try {
+        console.log('e:', e);
+        e.preventDefault();
+        const response = await axiosObj.get('/user/download', { headers: { Authorization: token } });
+        console.log('response:', response);
+
+        //download json as file
+        let exportObj=response.data;
+        let exportName="expenses";
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", exportName + ".txt");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+
+        //the bcakend is essentially sending a download link
+        //  which if we open in browser, the file would download
+        // var a = document.createElement("a");
+        // a.href = response.data.fileUrl;
+        // a.download = 'myexpense.csv';
+        // a.click();
+    }
+    catch (err) {
+        console.log('err:', err);
+        document.body.innerHTML += `<div style="color:red;">${err.response.data.message}</div>`;
+    }
 }
