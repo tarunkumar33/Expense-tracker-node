@@ -3,37 +3,42 @@ const axiosObj = axios.create({
 });
 
 const token = localStorage.getItem('token');
-const rowsperpage=localStorage.getItem('rowsperpage');
+
 const premiumUser = localStorage.getItem('premiumUser');
 const expenseFormArea = document.getElementById('expenseForm');
 const expensesListArea = document.getElementById('expensesList');
 
-window.addEventListener("DOMContentLoaded", getExpenses);
+window.addEventListener("DOMContentLoaded", showPageItems);
 expenseFormArea.addEventListener('submit', expenseHandler);
 expensesListArea.addEventListener('click', expensesListAreaHandler);
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded",premiumUserFeatures);
+function premiumUserFeatures(){
+    const premiumUser = localStorage.getItem('premiumUser');
     console.log('premiumUser:', premiumUser);
+    document.getElementById('downloadexpense').disabled=true;
     if (premiumUser != null && premiumUser === "true") {
         document.body.classList.add('bg-dark');
         console.log(document.body);
+        document.getElementById('downloadexpense').disabled=false;
     }
-});
+}
 
-function displayPagination({hasPreviousPage,previousPage,hasNextPage,nextPage,currentPage,lastPage}){
-    const pagination=document.getElementById('pagination');
-    pagination.innerHTML='';
-    if(hasPreviousPage){
-        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${previousPage})">
+function displayPagination({ hasPreviousPage, previousPage, hasNextPage, nextPage, currentPage, lastPage }) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if (hasPreviousPage) {
+        pagination.innerHTML += `<button class="btn" onClick="showPageItems(${previousPage})">
         ${previousPage} </button>`;
     }
-    pagination.innerHTML+=`<button class="btn active" style="border: solid 2px black;" onClick="showPageItems(${currentPage})">
+    pagination.innerHTML += `<button class="btn active" style="border: solid 2px black;" onClick="showPageItems(${currentPage})">
         ${currentPage}</button>`;
-    if(hasNextPage){
-        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${nextPage})">
+    if (hasNextPage) {
+        pagination.innerHTML += `<button class="btn" onClick="showPageItems(${nextPage})">
         ${nextPage}</button>`;
     }
-    if(lastPage!=currentPage && lastPage!=nextPage)
-        pagination.innerHTML+=`<button class="btn" onClick="showPageItems(${lastPage})">
+    if (lastPage != currentPage && lastPage != nextPage)
+        pagination.innerHTML += `<button class="btn" onClick="showPageItems(${lastPage})">
         ${lastPage}</button>`;
 }
 async function expensesListAreaHandler(e) {
@@ -44,7 +49,7 @@ async function expensesListAreaHandler(e) {
             const token = localStorage.getItem('token');
             const res = await axiosObj.delete(`/user/deleteExpense/${e.target.parentElement.id}`, { headers: { Authorization: token } });
             console.log('res:', res)
-            getExpenses();
+            showPageItems();
         }
 
     }
@@ -53,23 +58,38 @@ async function expensesListAreaHandler(e) {
         document.body.innerHTML += `<div style="color:red;">${err.response.data.message}</div>`;
     }
 }
-async function getExpenses() {
-    try {
-        // const token = localStorage.getItem('token');
-        const res = await axiosObj.get('/user/getExpenses', { headers: { Authorization: token } });
-        console.log(res);
-        displayExpensesInUI(res.data.expenses);
-        displayPagination(res.data);
-    }
-    catch (err) {
-        console.log(err);
-        document.body.innerHTML += `<div style="color:red;">${err.response.data.message}</div>`;
+document.getElementById('rowsPerPage').addEventListener('change', async (e) => {
+    console.log('e:', e.target);
+    localStorage.setItem('rowsperpage', e.target.value);
+    showPageItems(1);
+})
+function displayRowsUI(totalCount) {
+    console.log('totalCount:', totalCount);
+    const UIelement = document.getElementById('rowsPerPage');
+    UIelement.innerHTML = '';
+    let i = 0;
+    do {
+        i += 5;
+        console.log('i:', i);
+        UIelement.innerHTML += `<option value=${i}>${i}</option>`;
+    } while (i < totalCount);
+    if(localStorage.getItem('rowsperpage')){
+        UIelement.value = localStorage.getItem('rowsperpage');
     }
 }
-async function showPageItems(page){
-    try{
-        const res = await axiosObj.get(`/user/getExpenses?page=${page}`, { headers: { Authorization: token } });
+
+async function showPageItems(page) {
+    try {
+        let rowsperpage=5;
+        if(localStorage.getItem('rowsperpage')){
+            rowsperpage = localStorage.getItem('rowsperpage');
+        }
+        else{
+            localStorage.setItem('rowsperpage',rowsperpage);
+        }
+        const res = await axiosObj.get(`/user/getExpenses?rows=${rowsperpage}&page=${page ||1}`, { headers: { Authorization: token } });
         console.log(res);
+        displayRowsUI(res.data.totalExpenses);
         displayExpensesInUI(res.data.expenses);
         displayPagination(res.data);
     }
@@ -81,8 +101,8 @@ async function showPageItems(page){
 function displayExpensesInUI(expenses) {
     expensesListArea.innerHTML = '';
     expenses.forEach((expense) => {
-        const { id, expenseAmount, description, category } =expense;
-            expensesListArea.innerHTML += `<li class="list-group-item" id=${id}>${expenseAmount}-${description}-${category}
+        const { id, expenseAmount, description, category } = expense;
+        expensesListArea.innerHTML += `<li class="list-group-item" id=${id}>${expenseAmount}-${description}-${category}
             <button class="btn btn-danger btn-sm float-right delete">X</button></li>`;
     });
 }
@@ -98,7 +118,10 @@ async function expenseHandler(e) {
         },
             { headers: { Authorization: token } });
         console.log(res);
-        getExpenses();
+        e.target.expenseAmount.value='';
+        e.target.description.value='';
+        e.target.category.value='';
+        showPageItems();
     }
     catch (err) {
         console.log(err);
@@ -129,7 +152,9 @@ document.getElementById('rzp-button1').onclick = async function (e) {
                 order_id: options.order_id,
                 payment_id: response.razorpay_payment_id,
             }, { headers: { "Authorization": token } }).then(() => {
-                alert('You are a Premium User Now')
+                alert('You are a Premium User Now');
+                localStorage.setItem('premiumUser',true);
+                premiumUserFeatures();
             }).catch(() => {
                 alert('Something went wrong. Try Again!!!')
             })
