@@ -2,8 +2,8 @@ const AWS = require('aws-sdk');
 
 exports.uploadToS3=(data, fileName)=>{
     const BUCKET_NAME = 'expensetrackingapp';
-    const IAM_USER_KEY = 'AKIAXE4RRNSTARQISWMX3KWUSTAR';
-    const IAM_USER_SECRET = 'UCERDJNdbQprSTARqi8GLMLSJ3JooMLA019jJUI8dTgZSTAR';
+    const IAM_USER_KEY = 'accesskey';
+    const IAM_USER_SECRET = 'secretkey';
 
     const s3Bucket = new AWS.S3({
         accessKeyId: IAM_USER_KEY,
