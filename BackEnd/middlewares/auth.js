@@ -4,7 +4,7 @@ const User=require('../models/user');
 exports.authenticate=async (req,res,next)=>{
     try{
         console.log('Auth');
-        const {id}=jwt.verify(req.headers.authorization,"asdffghjklhhgvmj");
+        const {id}=jwt.verify(req.headers.authorization,process.env.TOKEN_SECRET);
         const userRes=await User.findByPk(id);
         req.user=userRes;
         next();

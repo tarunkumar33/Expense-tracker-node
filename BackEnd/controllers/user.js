@@ -9,7 +9,7 @@ function isStringInvalid(string){
     return false;
 }
 function generateAccessToken(id){
-    return jwt.sign({id:id},"asdffghjklhhgvmj");
+    return jwt.sign({id:id},process.env.TOKEN_SECRET);
 }
 exports.loginUser=async (req,res,next)=>{
     try{

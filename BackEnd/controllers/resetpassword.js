@@ -4,7 +4,7 @@ const uuid = require('uuid');
 
 const User = require('../models/user');
 const Forgotpassword = require('../models/forgotpassword');
-const SENGRID_API_KEY = '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';
+
 
 exports.forgotpassword = async (req, res) => {
     try {
@@ -14,7 +14,7 @@ exports.forgotpassword = async (req, res) => {
             const id = uuid.v4();
             await user.createForgotpassword({ id, active: true });
 
-            sgMail.setApiKey(SENGRID_API_KEY);
+            sgMail.setApiKey(process.env.SENGRID_API_KEY);
 
             const msg = {
                 to: email, // Change to your recipient

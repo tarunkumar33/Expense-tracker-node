@@ -1,14 +1,13 @@
 const razorpay=require('razorpay');
 const Order=require('../models/order');
 
-const RAZORPAY_KEY_ID='rzp_test_7EozIfQ8l31Aai'
-const RAZORPAY_KEY_SECRET='SiiyZJJlLoy4lFY40vjleAGm'
+
 
 const purchasepremium =async (req, res) => {
     try {
         var rzp = new razorpay({
-            key_id: RAZORPAY_KEY_ID,
-            key_secret: RAZORPAY_KEY_SECRET
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
         })
         const amount = 2500;
 

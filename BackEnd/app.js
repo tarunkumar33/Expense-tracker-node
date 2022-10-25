@@ -1,7 +1,15 @@
+const dotenv=require('dotenv');
+// get config vars
+dotenv.config(); //when process env gets defined
 const cors=require('cors');
 const express=require('express');
 const bodyParser=require('body-parser')
 const sequelize=require('./utils/database');
+const helmet=require('helmet');
+const morgan=require('morgan');
+const fs=require('fs');
+const path=require('path');
+
  //routes import
 const userRoutes=require('./routes/user');
 const purchaseRoutes=require('./routes/purchase');
@@ -16,6 +24,10 @@ const Forgotpassword=require('./models/forgotpassword');
 //middlewares
 const app=express();
 app.use(cors());
+
+const accessLogStream=fs.createWriteStream(path.join(__dirname,'access.log'),{flags:'a'});
+
+app.use(morgan('combined',{stream:accessLogStream}))
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.json());
  //routes middleware
@@ -24,6 +36,7 @@ app.use('/purchase',purchaseRoutes);
 app.use('/leaderboard',leaderboardRoutes);
 app.use('/password',resetpasswordRoutes);
 
+// console.log('process.env:', process.env);
 //associations
 User.hasMany(Expense);
 Expense.belongsTo(User);
